@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
@@ -18,11 +19,9 @@ import android.os.ParcelUuid;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.maps.GoogleMap;
 
@@ -37,6 +36,8 @@ import no.nordicsemi.android.support.v18.scanner.ScanFilter;
 import no.nordicsemi.android.support.v18.scanner.ScanResult;
 import no.nordicsemi.android.support.v18.scanner.ScanSettings;
 
+import static android.bluetooth.BluetoothGattCharacteristic.FORMAT_UINT8;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -50,9 +51,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     private static final long SCAN_PERIOD = 10000;
-
-    public static UUID SERVICE_UUID = UUID.fromString("6E400001-B5A3-F393-E0A9-E50E24DCCA9E");
-    public static UUID CHARACTERISTIC_COUNTER_UUID = UUID.fromString("6E400001-B5A3-F393-E0A9-E50E24DCCA9E");
+    public static String ServUUID = "4fafc201-1fb5-459e-8fcc-c5c9c331914b";
+    public static UUID SERVICE_UUID = UUID.fromString(ServUUID);
+    public static UUID CHARACTERISTIC_UUID = UUID.fromString("beb5483e-36e1-4688-b7f5-ea07361b26a8");
     public static UUID CHARACTERISTIC_INTERACTOR_UUID = UUID.fromString("6E400001-B5A3-F393-E0A9-E50E24DCCA9E");
     public static UUID DESCRIPTOR_CONFIG_UUID = UUID.fromString("6E400001-B5A3-F393-E0A9-E50E24DCCA9E");
     private int currentCounterValue;
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
     private GoogleMap mMap;
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
     BluetoothDevice device;
+    List<ScanFilter> filters = new ArrayList<>();
 
 
     @Override
@@ -116,16 +118,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
-                        PackageManager.PERMISSION_GRANTED) {
-                Log.w(TAG,"PERMISSIONOK");
-
-        } else {
-            Toast.makeText(this, R.string.error_permission_map, Toast.LENGTH_LONG).show();
-            Log.w(TAG,"PERMISSIONNOOOTTTTTOK");
-        }
 
 
         scanner = BluetoothLeScannerCompat.getScanner();
@@ -137,25 +129,41 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         List<ScanFilter> filters = new ArrayList<>();
-        filters.add(new ScanFilter.Builder().setServiceUuid(mUuid).build());
-        mDisplay.setText(String.valueOf(filters.size()));
-        scanner.startScan(null, settings, mScanCallback);
+
+
 
         //Log.w(TAG, String.valueOf(filters.size()));
         //Log.w(TAG, String.valueOf(filters.get(0)));
-        //scanFilter = new ScanFilter.Builder().setServiceUuid(new ParcelUuid(SERVICE_UUID)).build();
+        ScanFilter scanFilter = new ScanFilter.Builder()
+                .setServiceUuid(ParcelUuid.fromString(String.valueOf(SERVICE_UUID)))
+                .build();
+        filters.add(scanFilter);
+        filters.add(new ScanFilter.Builder().setServiceUuid(mUuid).build());
+        mDisplay.setText(String.valueOf(filters.size()));
+        scanner.startScan(filters, settings, mScanCallback);
+        scanFilter = new ScanFilter.Builder().setServiceUuid(new ParcelUuid(SERVICE_UUID)).build();
         //scanner.startScan(Arrays.asList(scanFilter), settings, mScanCallback);
+
+
 
 
     }
 
     public void testonclick(View view) {
+        mCount++;
 
-        //if ( mDisplay != null) mDisplay.setText(String.valueOf(mCount));
+        mDisplay.setText(String.valueOf(mCharacteristic.getIntValue(FORMAT_UINT8,0)));
+        //mBluetoothGatt.getConnectionState()
 
 
     }
 
+
+    @Override
+    public void onContentChanged() {
+        super.onContentChanged();
+        Log.i(TAG, "---CONTENTCAHNGE---");
+    }
 
     private android.bluetooth.BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
         @Override
@@ -167,6 +175,9 @@ public class MainActivity extends AppCompatActivity {
                 gatt.discoverServices();
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 Log.i(TAG, "Disconnected from GATT client.");
+                Name.setText("Disconnected");
+                scanner.startScan(filters, settings, mScanCallback);
+
             }
         }
 
@@ -183,18 +194,31 @@ public class MainActivity extends AppCompatActivity {
             for (BluetoothGattService gattService : gatt.getServices()) {
                 Log.i(TAG, "" + gatt.getDevice().getName() + "=" + gattService.getUuid().toString());
 
-                if (gattService.getUuid().toString().equals("0000ffe5-0000-1000-8000-00805f9b34fb")) {
+                if (gattService.getUuid().toString().equals(ServUUID)) {
                     BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();
                     scanner.stopScan(mScanCallback);
 
-                    Log.i(TAG, "LED found...");
-                    mCharacteristic = gattService.getCharacteristic(UUID.fromString("0000ffe9-0000-1000-8000-00805f9b34fb"));
 
-                    String command = "FFFFFF";
-                    String originalString = "56" + command + "00F0AA";
-                    byte[] b = Utils.hexStringToByteArray(originalString);
-                    mCharacteristic.setValue(b);
-                    mBluetoothGatt.writeCharacteristic(mCharacteristic);
+                    //Name.setText(device.getName());
+                    Log.i(TAG, "LED found...");
+                    //mCharacteristic = gattService.getCharacteristic(UUID.fromString("4fafc201-1fb5-459e-8fcc-c5c9c331914b"));
+                    mCharacteristic = gattService.getCharacteristic(CHARACTERISTIC_UUID);
+                    gatt.setCharacteristicNotification(mCharacteristic,true);
+                    BluetoothGattDescriptor descriptor = mCharacteristic.getDescriptor(
+                            CHARACTERISTIC_UUID);
+                    descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+                    gatt.writeDescriptor(descriptor);
+
+                    gatt.readCharacteristic(mCharacteristic);
+                    //Name.setText(device.getName());
+                    if(mCharacteristic!=null){
+                        //mDisplay.setText(String.valueOf(mCharacteristic.getIntValue(FORMAT_UINT8,4)));
+                    }
+
+
+
+                    //mCharacteristic.setValue(b);
+                    //mBluetoothGatt.writeCharacteristic(mCharacteristic);
                 }
             }
         }
@@ -203,6 +227,7 @@ public class MainActivity extends AppCompatActivity {
         public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             super.onCharacteristicRead(gatt, characteristic, status);
             Log.i(TAG, "onCharacteristicRead: ");
+            
         }
 
         @Override
@@ -223,7 +248,11 @@ public class MainActivity extends AppCompatActivity {
             super.onReliableWriteCompleted(gatt, status);
             Log.i(TAG, "onReliableWriteCompleted: ");
         }
+
+
+
     };
+
 
     private final ScanCallback mScanCallback = new ScanCallback() {
 
@@ -233,19 +262,43 @@ public class MainActivity extends AppCompatActivity {
 
 
         public void onBatchScanResults(List<ScanResult> results) {
+
             if (!results.isEmpty()) {
                 int i = 0;
-                //while (results.get(i)!=null){
+                while (i<results.size()){
                     ScanResult result = results.get(i);
                     device = result.getDevice();
                     deviceAddress = device.getAddress();
-                    mBluetoothGatt = device.connectGatt(getApplicationContext(), true, mGattCallback);
-                    BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();
-                    scanner.stopScan(mScanCallback);
-                    Name.setText(device.getName());
+                    String deviceName = device.getName();
+                    if( deviceName != null && deviceName.equals("ESP32") ) {
+                        mBluetoothGatt = device.connectGatt(getApplicationContext(), false, mGattCallback);
+                        BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();
+                        scanner.stopScan(mScanCallback);
+                        Name.setText(device.getName());
+                    }
                     i++;
-                //}
+                }
 
+            }
+/*
+            if (!results.isEmpty()) {
+                int i = 0;
+                while (results.get(i)!=null){
+                ScanResult result = results.get(i);
+                device = result.getDevice();
+                deviceAddress = device.getAddress();
+                mBluetoothGatt = device.connectGatt(getApplicationContext(), false, mGattCallback);
+                BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();
+                scanner.stopScan(mScanCallback);
+                Name.setText(device.getName());
+                i++;
+                }
+
+            }
+
+*/
+            else{
+                Name.setText("SCANNING");
             }
         }
 
@@ -254,6 +307,8 @@ public class MainActivity extends AppCompatActivity {
             // Scan error
         }
     };
+
+
 
 
 }

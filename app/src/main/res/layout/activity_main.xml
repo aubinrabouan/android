@@ -8,19 +8,20 @@
 
     <TextView
         android:id="@+id/Name"
-        android:layout_width="201dp"
-        android:layout_height="49dp"
+        android:layout_width="301dp"
+        android:layout_height="78dp"
         android:layout_marginTop="32dp"
-        android:text="@string/name_please"
         android:gravity="center"
+        android:text="@string/name_please"
+        android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/mDisplay"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="398dp"
+        android:layout_height="50dp"
         android:layout_marginTop="24dp"
         android:gravity="center"
         android:text="@string/mcountdisplay"
@@ -30,15 +31,17 @@
         app:layout_constraintBottom_toTopOf="@+id/button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Name" />
+        app:layout_constraintTop_toBottomOf="@+id/Name"
+        app:layout_constraintVertical_bias="1.0" />
 
     <Button
         android:id="@+id/button"
-        android:layout_width="match_parent"
-        android:layout_height="123dp"
+        android:layout_width="425dp"
+        android:layout_height="78dp"
         android:onClick="testonclick"
         android:text="@string/READDATA"
         app:layout_constraintBottom_toBottomOf="parent"
-        tools:layout_editor_absoluteX="-16dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
