@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     public static String ServUUID = "4fafc201-1fb5-459e-8fcc-c5c9c331914b";
     public static UUID SERVICE_UUID = UUID.fromString(ServUUID);
     public static UUID CHARACTERISTIC_UUID = UUID.fromString("beb5483e-36e1-4688-b7f5-ea07361b26a8");
-    public static UUID CHARACTERISTIC_INTERACTOR_UUID = UUID.fromString("6E400001-B5A3-F393-E0A9-E50E24DCCA9E");
+    public static UUID CHARACTERISTIC_NOTIFY_UUID = UUID.fromString("BEB5483E-36E1-4688-B7F5-EA07361b26A8");
     public static UUID DESCRIPTOR_CONFIG_UUID = UUID.fromString("6E400001-B5A3-F393-E0A9-E50E24DCCA9E");
     private int currentCounterValue;
     private AbstractQueue<BluetoothDevice> mRegisteredDevices;
@@ -202,10 +202,9 @@ public class MainActivity extends AppCompatActivity {
                     //Name.setText(device.getName());
                     Log.i(TAG, "LED found...");
                     //mCharacteristic = gattService.getCharacteristic(UUID.fromString("4fafc201-1fb5-459e-8fcc-c5c9c331914b"));
-                    mCharacteristic = gattService.getCharacteristic(CHARACTERISTIC_UUID);
+                    mCharacteristic = gattService.getCharacteristic(CHARACTERISTIC_NOTIFY_UUID);
                     gatt.setCharacteristicNotification(mCharacteristic,true);
-                    BluetoothGattDescriptor descriptor = mCharacteristic.getDescriptor(
-                            CHARACTERISTIC_UUID);
+                    BluetoothGattDescriptor descriptor = mCharacteristic.getDescriptor(CHARACTERISTIC_NOTIFY_UUID);
                     descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
                     gatt.writeDescriptor(descriptor);
 
@@ -240,7 +239,11 @@ public class MainActivity extends AppCompatActivity {
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
             super.onCharacteristicChanged(gatt, characteristic);
             Log.i(TAG, "onCharacteristicChanged: ");
-            mDisplay.setText(String.valueOf(characteristic.getIntValue(0,0)));
+            if(characteristic.getIntValue(FORMAT_UINT8,0)!=null) {
+                mDisplay.setText(String.valueOf(characteristic.getIntValue(FORMAT_UINT8, 0)));
+            }else{
+                Log.w(TAG,"RECEIVE NULL VALUE");
+            }
         }
 
         @Override
