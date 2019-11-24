@@ -22,6 +22,10 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
+
 import java.util.AbstractQueue;
 import java.util.ArrayList;
 import java.util.List;
@@ -73,6 +77,11 @@ public class MainActivity extends AppCompatActivity {
     public boolean connectionStatus = false;
     public boolean ScanStatus = false;
 
+    GraphView graph;
+    LineGraphSeries<DataPoint> series;
+    int receivedValue;
+    int numberValueGraph = 200;
+    int graphValue = numberValueGraph;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,6 +131,17 @@ public class MainActivity extends AppCompatActivity {
 
         deviceNameDisplay.setText(NAME_DEVICE);
 
+        graph = (GraphView) findViewById(R.id.graph);
+        series = new LineGraphSeries<>(generateData());
+        graph.addSeries(series);
+        graph.getViewport().setXAxisBoundsManual(true);
+        graph.getViewport().setMinY(0);
+        graph.getViewport().setMaxY(255);
+        graph.getViewport().setScrollable(true);
+        graph.getViewport().setScrollableY(false);
+        series.setColor(R.color.colorPrimaryDark);
+
+
     }
 
 
@@ -149,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private android.bluetooth.BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
+    private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             super.onConnectionStateChange(gatt, status, newState);
@@ -190,15 +210,15 @@ public class MainActivity extends AppCompatActivity {
                     //BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();
                     scanner.stopScan(mScanCallback);
                     mCharacteristic = gattService.getCharacteristic(CHARACTERISTIC_NOTIFY_UUID);
-                    gatt.setCharacteristicNotification(mCharacteristic,true);
+                    gatt.setCharacteristicNotification(mCharacteristic, true);
 
                     List<BluetoothGattDescriptor> descriptorList = mCharacteristic.getDescriptors();
                     BluetoothGattDescriptor descriptor = null;
-                    for(int i=0; i<descriptorList.size();i++){
+                    for (int i = 0; i < descriptorList.size(); i++) {
                         Log.e(TAG, "BluetoothGattDescriptor: " + descriptorList.get(i).getUuid().toString());
 
                     }
-                    if(descriptorList.size()>0) {
+                    if (descriptorList.size() > 0) {
                         descriptor = descriptorList.get(0);
                         descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
                         mCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
@@ -216,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
         public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             super.onCharacteristicRead(gatt, characteristic, status);
             Log.i(TAG, "onCharacteristicRead: ");
-            
+
         }
 
         @Override
@@ -229,10 +249,16 @@ public class MainActivity extends AppCompatActivity {
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
             super.onCharacteristicChanged(gatt, characteristic);
             Log.i(TAG, "onCharacteristicChanged: ");
-            if(characteristic.getIntValue(FORMAT_UINT8,0)!=null) {
-                valueDisplay.setText(String.valueOf(characteristic.getIntValue(FORMAT_UINT8, 0)));
-            }else{
-                Log.w(TAG,"RECEIVE NULL VALUE");
+
+            if (characteristic.getIntValue(FORMAT_UINT8, 0) != null) {
+                receivedValue = characteristic.getIntValue(FORMAT_UINT8, 0);
+                valueDisplay.setText(String.valueOf(receivedValue));
+                series.appendData(new DataPoint(graphValue, receivedValue), true, numberValueGraph);
+                graph.getViewport().setMinY(0);
+                graph.getViewport().setMaxY(110);
+                graphValue += 1;
+            } else {
+                Log.w(TAG, "RECEIVE NULL VALUE");
             }
         }
 
@@ -241,7 +267,6 @@ public class MainActivity extends AppCompatActivity {
             super.onReliableWriteCompleted(gatt, status);
             Log.i(TAG, "onReliableWriteCompleted: ");
         }
-
 
 
     };
@@ -284,4 +309,19 @@ public class MainActivity extends AppCompatActivity {
             // Scan error
         }
     };
+
+    private DataPoint[] generateData() {
+        int count = numberValueGraph;
+        DataPoint[] values = new DataPoint[count];
+        double x = 0;
+        DataPoint v = new DataPoint(x, 255);
+        values[0] = v;
+        for (int i=1; i<count; i++) {
+            x=i;
+            v = new DataPoint(x, 0);
+            values[i] = v;
+        }
+        return values;
+    }
+
 }

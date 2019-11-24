@@ -1,0 +1,5 @@
+<root>
+    <item name='com.jjoe64.graphview.series.DataPoint'>
+        <annotation name='java.lang.Deprecated' />
+    </item>
+</root>
