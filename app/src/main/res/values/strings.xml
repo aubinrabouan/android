@@ -1,12 +1,22 @@
 <resources>
-    <string name="app_name">Hello World</string>
+    <string name="app_name">CyberPony</string>
     <string name="name_please">DISCONNECTED</string>
-    <string name="mcountdisplay">NOTHING</string>
+    <string name="defaultBluetoothValue">(ô¿ô)</string>
     <string name="button">Button</string>
     <string name="name">Name</string>
-    <string name="READDATA">Read Data</string>
+    <string name="goToLiveData">See live Graph</string>
     <string name="ble_not_supported">ble_not_supported</string>
     <string name="title_devices">title_devices</string>
     <string name="error_bluetooth_not_supported">bluetooth_not_supported</string>
     <string name="error_permission_map">error_permission_map</string>
+    <string name="StatusScanFail">Device not found</string>
+    <string name="StatusBluetoothConnected">CONNECTED</string>
+    <string name="StatusBluetoothDisconnected">DISCONNECTED</string>
+    <string name="StatusBluetoothScanInProgress">SCANNING......</string>
+    <string name="DefaultUUID">"________-____-____-____-____________"</string>
+    <string name="NameCharacteristicUUID">Characteristic UUID :</string>
+    <string name="bluetoothConnect">CONNECT</string>
+    <string name="bluetoothDisconnect">DISCONNECT</string>
+    <string name="defaultDeviceName">Enter Device Name</string>
+    <string name="asciiArtZoydberg">(\\/) (;,,;) (\\/)</string>
 </resources>

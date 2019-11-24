@@ -4,44 +4,131 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimaryDark"
     tools:context=".MainActivity">
 
     <TextView
-        android:id="@+id/Name"
-        android:layout_width="301dp"
-        android:layout_height="78dp"
-        android:layout_marginTop="32dp"
+        android:id="@+id/StatusBluetooth"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="176dp"
         android:gravity="center"
-        android:text="@string/name_please"
+        android:text="@string/StatusBluetoothDisconnected"
+        android:textColor="@color/colorPrimaryWhite"
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/mDisplay"
-        android:layout_width="385dp"
-        android:layout_height="513dp"
+        android:id="@+id/displayValue"
+        android:layout_width="378dp"
+        android:layout_height="170dp"
         android:layout_marginTop="24dp"
         android:gravity="center"
-        android:text="@string/mcountdisplay"
-        android:textColor="#FF0000"
+        android:text="@string/defaultBluetoothValue"
+        android:textColor="@color/colorAccentRed"
         android:textSize="90sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/button"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.515"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Name"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toBottomOf="@+id/StatusBluetooth"
+        app:layout_constraintVertical_bias="0.0" />
 
     <Button
         android:id="@+id/button"
         android:layout_width="425dp"
         android:layout_height="78dp"
-        android:onClick="testonclick"
-        android:text="@string/READDATA"
+        android:backgroundTint="@color/colorAccentBlue"
+        android:onClick="onClickGraph"
+        android:text="@string/goToLiveData"
+        android:textColor="@color/colorPrimaryDark"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/BluetoothButtonConnection"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:backgroundTint="@color/colorAccentBlue"
+        android:onClick="onclickConnection"
+        android:text="@string/bluetoothConnect"
+        android:textColor="@color/colorPrimaryDark"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/editNameBluetoothDevice"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/nameCharUUID"
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:layout_marginStart="16dp"
+        android:text="@string/NameCharacteristicUUID"
+        android:textColor="@color/colorPrimaryWhite"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@+id/StatusBluetooth"
+        app:layout_constraintEnd_toStartOf="@+id/editCharacteristicUUID"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editNameBluetoothDevice" />
+
+    <EditText
+        android:id="@+id/editNameBluetoothDevice"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="11dp"
+        android:backgroundTint="@color/colorAccentRed"
+        android:ems="10"
+        android:gravity="center"
+        android:hint="@string/defaultDeviceName"
+        android:importantForAutofill="no"
+        android:inputType="textPersonName"
+        android:text="@string/defaultDeviceName"
+        android:textColor="@color/colorPrimaryWhite"
+        app:layout_constraintEnd_toStartOf="@+id/BluetoothButtonConnection"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/editCharacteristicUUID"
+        android:layout_width="250dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="8dp"
+        android:backgroundTint="@color/colorAccentRed"
+        android:ems="10"
+        android:gravity="center"
+        android:hint="@string/DefaultUUID"
+        android:importantForAutofill="no"
+        android:inputType="textPersonName"
+        android:text="@string/DefaultUUID"
+        android:textColor="@color/colorPrimaryWhite"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toTopOf="@+id/StatusBluetooth"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/nameCharUUID"
+        app:layout_constraintTop_toBottomOf="@+id/BluetoothButtonConnection" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="339dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/asciiArtZoydberg"
+        android:textColor="@color/colorPrimaryWhite"
+        android:textSize="36sp"
+        app:layout_constraintBottom_toTopOf="@+id/button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/displayValue" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
